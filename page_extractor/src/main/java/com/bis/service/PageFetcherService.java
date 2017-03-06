@@ -23,6 +23,9 @@ public class PageFetcherService {
 
 
     public void executeCasperCrawlScenario(Set<String> oneLevelUrls, int depth, Map<String, UrlStatus> allLevelsUrls, CrawlEntity publisher) {
+
+
+
         ExecutorService executor = Executors.newFixedThreadPool(CrawlerProperties.NUM_PHANTOM_PROCESSES.getIntValue());
         Set<Future<Set<String>>> futureSet = Collections.synchronizedSet(new HashSet<Future<Set<String>>>());
 
@@ -37,6 +40,8 @@ public class PageFetcherService {
                         crawlEntity.setScanUrl(url);
 
                         Callable<Set<String>> callable = new CasperCrawlCallableService(crawlEntity, depth, allLevelsUrls);
+                      //  Set<String> res = callable.call();
+
                         Future<Set<String>> future = executor.submit(callable);
                         futureSet.add(future);
                     }

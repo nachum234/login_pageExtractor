@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import utils.CommonUtils;
 
 import java.io.File;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -154,16 +155,23 @@ public class CasperCrawlCallableService implements Callable {
         } else {
             try {
                 //get domain=hostname without protocol
-                //  String currentUrlHostName = CommonUtils.getDomainNoProtocolAndNoWWW( new URL(levelUrl).getHost());
-                //  currentUrlHostName = currentUrlHostName.toLowerCase().trim();
+
                 //check if new url is not a my  publisher
                 if (publisherDomain.equalsIgnoreCase(CommonUtils.getDomainNoProtocolAndNoWWW(levelUrl))) {
                     logger.debug(levelUrl + "same to publisher " + publisherDomain);
                     isValidToScan = false;
                 }
                 else {
-                    //not in publishers and not in aliases
-                    isValidToScan = !publisherOrSection(levelUrl, publisherDomain) && !foundAsAlias(levelUrl, publisherDomain);
+                    String currentUrlHostName = CommonUtils.getDomainNoProtocolAndNoWWW( new URL(levelUrl.toLowerCase().trim()).getHost());
+                    logger.debug("For "+levelUrl+" host name "+currentUrlHostName);
+                    if(!currentUrlHostName.contains(publisherDomain)){
+                        logger.debug(levelUrl + "not from publisher domain " + publisherDomain);
+                        isValidToScan = false;
+                    }
+                    else {
+                        //not in publishers and not in aliases
+                        isValidToScan = !publisherOrSection(levelUrl, publisherDomain) && !foundAsAlias(levelUrl, publisherDomain);
+                    }
 
                 }
             } catch (Exception e) {
@@ -189,7 +197,7 @@ public class CasperCrawlCallableService implements Callable {
     private Set<String> getPossiblePublAndSections(String publisherDomain) {
         Set<String> possiblePublAndSectiona = Sets.newHashSet();
         possiblePublAndSectiona = CrawlerQService.allPublishers.keySet().stream().filter(
-                p -> p.contains(publisherDomain)
+                p -> p.contains(publisherDomain) && !p.equalsIgnoreCase(publisherDomain)
         ).collect(Collectors.toSet());
         return possiblePublAndSectiona;
     }
