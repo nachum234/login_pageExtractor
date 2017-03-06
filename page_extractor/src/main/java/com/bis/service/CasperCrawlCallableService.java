@@ -113,6 +113,9 @@ public class CasperCrawlCallableService implements Callable {
                         }
 
                     }
+                    else{
+                        logger.debug(oneLevelUrl+ " was detected before ");
+                    }
 
                 }
         );
@@ -147,14 +150,17 @@ public class CasperCrawlCallableService implements Callable {
         publisherDomain = publisherDomain.trim().toLowerCase();
         if (!levelUrl.contains(publisherDomain)) {
             isValidToScan = false;
+            logger.debug(levelUrl+ " not contains publisher domain ");
         } else {
             try {
                 //get domain=hostname without protocol
                 //  String currentUrlHostName = CommonUtils.getDomainNoProtocolAndNoWWW( new URL(levelUrl).getHost());
                 //  currentUrlHostName = currentUrlHostName.toLowerCase().trim();
                 //check if new url is not a my  publisher
-                if (publisherDomain.equalsIgnoreCase(CommonUtils.getDomainNoProtocolAndNoWWW(levelUrl)))
+                if (publisherDomain.equalsIgnoreCase(CommonUtils.getDomainNoProtocolAndNoWWW(levelUrl))) {
+                    logger.debug(levelUrl + "same to publisher " + publisherDomain);
                     isValidToScan = false;
+                }
                 else {
                     //not in publishers and not in aliases
                     isValidToScan = !publisherOrSection(levelUrl, publisherDomain) && !foundAsAlias(levelUrl, publisherDomain);
@@ -173,7 +179,9 @@ public class CasperCrawlCallableService implements Callable {
     private boolean publisherOrSection(String levelUrl, String publisherDomain) {
         Set<String> possiblePublAndSections = getPossiblePublAndSections(publisherDomain);
         for (String publOrSection : possiblePublAndSections) {
-            if (publOrSection.toLowerCase().contains(levelUrl.toLowerCase())) return true;
+            if (levelUrl.toLowerCase().contains(publOrSection.toLowerCase())){
+                return true;
+            }
         }
         return false;
     }

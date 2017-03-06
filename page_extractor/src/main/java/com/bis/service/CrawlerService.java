@@ -2,6 +2,7 @@ package com.bis.service;
 
 import com.bis.conf.CrawlerProperties;
 import com.bis.conf.CrawlingConfiguration;
+import com.bis.constants.UserAgent;
 import com.bis.model.CrawlEntity;
 import com.bis.model.JsonModel.PublisherScenario;
 import com.bis.model.UrlStatus;
@@ -73,6 +74,9 @@ public class CrawlerService {
                     cleanStorageFolders(crawlingConfiguration);
                 }
             }
+            else{
+                logger.debug("Done redirect to not a publisher");
+            }
 
         } catch (Exception ex) {
             logger.error("Failed execute crawler flow " + ex);
@@ -92,21 +96,26 @@ public class CrawlerService {
     private String updateDomainByRedirectIfFound(CrawlEntity publisher, long entityId, PageFetcherService pageFetcherService) {
         String domain = publisher.getCrawlingConfiguration().getPublisherUrl();
         try {
-
+            logger.debug("Check publisher for redirect "+publisher.getCrawlingConfiguration().getPublisherUrl());
             HttpURLConnection con = (HttpURLConnection) (new URL(domain).openConnection());
             con.setInstanceFollowRedirects(true);
+            con.setRequestProperty("User-Agent", UserAgent.DESKTOP.getUserAgentName());
             con.connect();
             int responseCode = con.getResponseCode();
-            logger.debug("Url responce code " + responseCode);
+            logger.debug("Url response code " + responseCode);
             String location = con.getHeaderField("Location");
             //String normLocation = CommonUtils.getDomainNoProtocolAndNoWWW(location.toLowerCase().trim());
-            if (CommonUtils.redirectCodes.contains(responseCode)) {
-
+            if (CommonUtils.redirectCodes.contains(responseCode) ) {
+                logger.debug(domain + "return response code that detect  redirect");
                 domain = checkAndUpdate(location, domain, entityId);
             } else {
                 if (responseCode >= HttpURLConnection.HTTP_BAD_REQUEST) {
+                    logger.debug("Http url connection cant detect if done redirect.Should check by casper");
                     location = pageFetcherService.getRedirectedUrl(publisher);
                     domain = checkAndUpdate(location, domain, entityId);
+                }
+                else{
+                    logger.debug("No redirect done . ");
                 }
             }
 
@@ -136,6 +145,7 @@ public class CrawlerService {
             domain = location;
             logger.debug("Done redirect to " + domain);
         }
+
         return domain;
 
 

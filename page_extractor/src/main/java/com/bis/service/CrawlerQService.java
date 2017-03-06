@@ -161,8 +161,8 @@ public class CrawlerQService implements MQListener {
                 report.info("");
                 report.info("");
             } else {
-                logger.debug("The domain not a publisher ,No crawling done ");
-                String logMessage = "Stopped the crawling because NOT a publisher.";
+                logger.debug("The redirected domain not a publisher ,No crawling done ");
+                String logMessage = "Stopped the crawling because redirected to NOT a publisher.";
                 logger.info(logWithTicketTemplate(logMessage,domain,countryId,channel));
                 report.info(logWithTicketTemplate(logMessage,domain,countryId,channel));
                 return true;

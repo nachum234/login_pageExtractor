@@ -135,6 +135,7 @@ public class EntitiesDao {
             pstmt.setString(2, publisher);
             pstmt.setLong(3, entityId);
             result = pstmt.execute();
+            log.debug("Added alias,publisher,entityid to redirect table :"+alias+","+publisher+","+entityId);
 
         } catch (SQLException sqle) {
             log.error("SQLException while loading Geo-Rules from DB", sqle);
