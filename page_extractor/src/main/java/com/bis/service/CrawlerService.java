@@ -106,7 +106,7 @@ public class CrawlerService {
             String location = con.getHeaderField("Location");
             //String normLocation = CommonUtils.getDomainNoProtocolAndNoWWW(location.toLowerCase().trim());
             if (CommonUtils.redirectCodes.contains(responseCode) ) {
-                logger.debug(domain + "return response code that detect  redirect");
+                logger.debug(domain + " return response code that detect  redirect to "+location);
                 domain = checkAndUpdate(location, domain, entityId);
             } else {
                 if (responseCode >= HttpURLConnection.HTTP_BAD_REQUEST) {
@@ -135,11 +135,11 @@ public class CrawlerService {
         //remove protocol and www from urls and then compare
         String normLocation = CommonUtils.getDomainNoProtocolAndNoWWW(location.toLowerCase().trim());
         if (!CommonUtils.getDomainNoProtocolAndNoWWW(domain.toLowerCase().trim()).equals(normLocation)) {
-            if (!CrawlerQService.allPublishers.containsKey(normLocation)) {
-                logger.debug("Found alias not defined as publisher in entites table " + location);
+            if (CrawlerQService.allPublishers.containsKey(normLocation)) {
+                logger.debug("Found alias  defined as publisher in entites table " + location);
                 return null;
             }
-            logger.debug("Found alias defined as publisher in entites table " + location);
+            logger.debug("Found alias defined not as publisher in entites table " + location);
             //alias is publisher.continue with this publisher(ticket)
             updateDbEntities(location, domain, entityId);
             domain = location;
