@@ -92,8 +92,8 @@ phantom.injectJs(loginScript);
 casper.start().then(function() {	
 console.log("in main before");
     //temporary removed.Failed to run on linux
-	//casper.login(loginUrl,storeFolder,scanUrl);
-	RESULT['loginStatus']=200;
+	casper.login(loginUrl,storeFolder,scanUrl);
+	//RESULT['loginStatus']=200;
 });
 
 
